@@ -1,0 +1,24 @@
+Vagrant.configure("2") do |config|
+  config.hostmanager.enabled = true
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.define "gcloud-app-server" do |h|
+    h.vm.hostname = "googlevm"
+    h.vm.network "private_network", ip: "34.155.23.136"
+    h.vm.provision :shell, inline: 'cat /vagrant/control.pub >> /home/vagrant/.ssh/authorized_keys'
+  end
+
+   config.vm.define "jenkins-server-vm" do |h|
+    h.vm.hostname = "jenkinsvm"
+    h.vm.network "private_network", ip: "20.39.240.227"
+    h.vm.provision :shell, inline: 'cat /vagrant/control.pub >> /home/vagrant/.ssh/authorized_keys'
+  end
+
+ config.vm.define "azure-db-server" do |h|
+   h.vm.hostname = "devopsvm"
+   h.vm.network "private_network", ip: "4.211.130.185"
+   h.vm.provision :shell, inline: 'cat /vagrant/control.pub >> /home/vagrant/.ssh/authorized_keys'
+ end
+
+
+end

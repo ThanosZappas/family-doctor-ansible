@@ -1,0 +1,10 @@
+app:
+  env:
+    server.port: "{{app_port}}"
+    spring.datasource.username: dbuser
+    spring.datasource.password: pass123
+    spring.datasource.url: jdbc:postgresql://4.211.130.185:5432/db
+
+service:
+  workingdir: "/home/zami/spring"
+  execstart: "java -jar out/artifacts/FamilyDoctor_jar/FamilyDoctor.jar"
