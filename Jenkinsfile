@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'version1', url: 'git@github.com:ThanosZappas/family-doctor-ansible.git'
+                git branch: 'main', url: 'git@github.com:ThanosZappas/family-doctor-ansible.git'
             }
         }
         // stage('Test') {
