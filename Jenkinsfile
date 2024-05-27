@@ -48,10 +48,10 @@ pipeline {
                      sed -i 's/vagrant/azureuser/g' ~/workspace/ansible-test/host_vars/appserver-vm.yaml
                 '''
                 sh '''
-                    # edit host var for appserver
+                    # edit host var for gcloud-app-server
 
                     export ANSIBLE_CONFIG=~/workspace/ansible-test/ansible.cfg
-                    ansible-playbook -i ~/workspace/ansible-test/hosts.yaml -l appserver-vm ~/workspace/ansible-test/playbooks/spring.yaml
+                    ansible-playbook -i ~/workspace/ansible-test/hosts.yaml -l gcloud-app-server ~/workspace/ansible-test/playbooks/spring.yaml
                 '''
             }
         }
@@ -60,7 +60,7 @@ pipeline {
        //          sh '''
        //              sed -i 's/dbserver/4.211.130.185/g' ~/DevOps/family-doctor-ansible/host_vars/appserver-vm.yaml
        //              export ANSIBLE_CONFIG=~/DevOps/family-doctor-ansible//ansible.cfg
-       //              ansible-playbook -i ~/workspace/ansible/hosts.yaml -l appserver-vm -e branch=main -e backend_server_url=http://localhost:9090 ~//DevOps/family-doctor-ansible/playbooks/vuejs.yaml
+       //              ansible-playbook -i ~/workspace/ansible/hosts.yaml -l gcloud-app-server -e branch=main -e backend_server_url=http://localhost:9090 ~/workspace/ansible-test/playbooks/vuejs.yaml
        //          '''
        //      }
        // }
