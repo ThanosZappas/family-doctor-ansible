@@ -55,20 +55,20 @@ pipeline {
                 '''
             }
         }
-       // stage('Deploy frontend') {
-       //      steps {
-       //          sh '''
-       //              sed -i 's/dbserver/4.211.130.185/g' ~/DevOps/family-doctor-ansible/host_vars/appserver-vm.yaml
-       //              export ANSIBLE_CONFIG=~/DevOps/family-doctor-ansible//ansible.cfg
-       //              ansible-playbook -i ~/workspace/ansible/hosts.yaml -l gcloud-app-server -e branch=main -e backend_server_url=http://localhost:9090 ~/workspace/ansible-test/playbooks/vuejs.yaml
-       //          '''
-       //      }
-       // }
+       stage('Deploy frontend') {
+            steps {
+                sh '''
+                    sed -i 's/dbserver/4.211.130.185/g' ~/workspace/ansible-test/host_vars/appserver-vm.yaml
+                    export ANSIBLE_CONFIG=~/workspace/ansible-test/ansible.cfg
+                    ansible-playbook -i ~/workspace/ansible-test/hosts.yaml -l gcloud-app-server -e branch=main -e backend_server_url=http://localhost:9090 ~/workspace/ansible-test/playbooks/vuejs.yaml
+                '''
+            }
+       }
     }
 
-    post {
-        always {
-            mail  to: "${EMAIL_TO}", body: "Project ${env.JOB_NAME} <br>, Build status ${currentBuild.currentResult} <br> Build Number: ${env.BUILD_NUMBER} <br> Build URL: ${env.BUILD_URL}", subject: "JENKINS: Project name -> ${env.JOB_NAME}, Build -> ${currentBuild.currentResult}"
-        }
-    }
+    // post {
+    //     always {
+    //         mail  to: "${EMAIL_TO}", body: "Project ${env.JOB_NAME} <br>, Build status ${currentBuild.currentResult} <br> Build Number: ${env.BUILD_NUMBER} <br> Build URL: ${env.BUILD_URL}", subject: "JENKINS: Project name -> ${env.JOB_NAME}, Build -> ${currentBuild.currentResult}"
+    //     }
+    // }
 }

@@ -1,5 +1,5 @@
 ---
-- hosts: appservers
+- hosts: gcloud-app-server
 
   vars:
       frontendappdir: "{{ ansible_user_dir }}/frontend"
