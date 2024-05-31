@@ -1,10 +1,15 @@
+appdir: "{{ ansible_user_dir }}/spring"
+branch: "version1"
+app_port: 9090
+appuser: "zami"
+appgroup: "zami"
 app:
   env:
-    server.port: "{{app_port}}"
+    server.port: 9090
     spring.datasource.username: dbuser
     spring.datasource.password: pass123
     spring.datasource.url: jdbc:postgresql://4.211.130.185:5432/db
 
 service:
   workingdir: "/home/zami/spring"
-  execstart: "java -jar out/artifacts/FamilyDoctor_jar/FamilyDoctor.jar"
+  execstart: "java -jar target/FamilyDoctor.jar"
