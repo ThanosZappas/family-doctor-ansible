@@ -36,10 +36,11 @@
         args:
             chdir: "{{ appdir }}"
 
-     - name: "Run the Spring application"
-       command: "java -jar target/FamilyDoctor-0.0.1-SNAPSHOT.jar"
-       args:
-           chdir: "{{ appdir }}"
+      # - name: "Run the Spring application"
+      #   ansible.builtin.command: 
+      #     cmd: "java -jar target/FamilyDoctor-0.0.1-SNAPSHOT.jar" 
+      #   args:
+      #     chdir: "{{ appdir }}"
 
       - name: copy spring service file
         template:
