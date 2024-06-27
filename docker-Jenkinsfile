@@ -101,7 +101,7 @@ pipeline {
                     # edit host var for jenkinsvm
 
                     export ANSIBLE_CONFIG=~/workspace/ansible-test/ansible.cfg
-                    ansible-playbook -i ~/workspace/ansible-test/hosts.yaml -l jenkinsvm ~/workspace/ansible-test/playbooks/spring.yaml
+                    ansible-playbook -i ~/workspace/ansible-test/hosts.yaml -l jenkinsvm ~/workspace/ansible-test/playbooks/spring-from-docker-compose.yaml
                 '''
             }
         }
