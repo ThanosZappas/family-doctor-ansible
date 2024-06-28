@@ -1,0 +1,99 @@
+---
+- name: Setup and deploy FamilyDoctor application
+  hosts: azure-db-server
+  become: yes
+
+  pre_tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Ensure pip is installed
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Uninstall any existing Docker Compose version
+      pip:
+        name: docker-compose
+        state: absent
+
+    - name: Download Docker Compose binary
+      shell: curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m`" -o /usr/local/bin/docker-compose
+
+    - name: Apply executable permissions to the Docker Compose binary
+      file:
+        path: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Check Docker version
+      command: docker --version
+      register: docker_version
+
+    - name: Check Docker Compose version
+      command: /usr/local/bin/docker-compose --version
+      register: docker_compose_version
+
+    - name: Debug Docker and Docker Compose versions
+      debug:
+        msg: 
+          - "Docker version: {{ docker_version.stdout }}"
+          - "Docker Compose version: {{ docker_compose_version.stdout }}"
+
+  tasks:
+    - name: Clone FamilyDoctor repository
+      git:
+        repo: https://github.com/grgcncr/FamilyDoctor.git
+        dest: /home/{{ ansible_user_id }}/FamilyDoctor
+        version: version1
+
+    - name: Change directory ownership to the ansible_user
+      file:
+        path: /home/{{ ansible_user_id }}/FamilyDoctor
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+
+    - name: Run docker-compose up
+      shell: docker compose up -d spring
+      args:
+        chdir: /home/{{ ansible_user_id }}/FamilyDoctor
+      register: docker_compose_up
+      ignore_errors: yes
+
+    - name: Check docker-compose up result
+      fail:
+        msg: "Docker Compose failed with error: {{ docker_compose_up.stderr }}"
+      when: docker_compose_up.failed
+
+  post_tasks:
+    - name: Verify Docker Compose services are running
+      shell: docker ps
+      register: docker_ps_output
+
+    - debug:
+        var: docker_ps_output.stdout

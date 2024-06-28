@@ -8,7 +8,7 @@ app:
     server.port: 9090
     spring.datasource.username: dbuser
     spring.datasource.password: pass123
-    spring.datasource.url: jdbc:postgresql://4.211.130.185:5432/db
+    spring.datasource.url: jdbc:postgresql://4.211.130.185:5432/postgres
 
 service:
   workingdir: "/home/zami/spring"

@@ -1,0 +1,81 @@
+---
+- name: docker compose app with ansible
+  hosts: azure-db-server
+  become: yes
+  vars: 
+    appdir: "{{ ansible_user_dir }}/FamilyDoctor"
+    branch: "version1"
+
+  pre_tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Install pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+
+    - name: "Clone the git repository"
+      git:
+         repo: "https://github.com/grgcncr/FamilyDoctor.git"
+         dest: "{{ appdir }}"
+         version: "{{ branch }}"  
+         force: yes
+
+    # - name: "Populate application.properties"
+    #   lineinfile:
+    #     dest: "{{ appdir }}/src/main/resources/application.properties"
+    #     state: present
+    #     regexp: "^{{item.key}}="
+    #     line: "{{item.key}}={{item.value}}"
+    #     with_items:
+    #       - "{{app.env | dict2items}}" 
+
+    # - name: Change directory ownership to the ansible_user
+    #   file:
+    #     path: /home/{{ ansible_user_id }}/FamilyDoctor
+    #     state: directory
+    #     owner: "{{ ansible_user_id }}"
+    #     group: "{{ ansible_user_id }}"
+
+    - name: Run docker-compose up
+      shell: docker compose up 
+      args:
+        chdir: "{{appdir}}"
+
+  post_tasks:
+    - name: Verify Docker Compose services are running
+      shell: docker ps
+      register: docker_ps_output
+
+    - debug:
+        var: docker_ps_output.stdout
