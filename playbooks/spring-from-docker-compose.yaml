@@ -1,6 +1,6 @@
 ---
 - name: Setup and deploy FamilyDoctor application
-  hosts: azure-db-server
+  hosts: gcloud-app-server
   become: yes
 
   pre_tasks:
