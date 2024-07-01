@@ -88,7 +88,7 @@
         group: "{{ ansible_user_id }}"
 
     - name: Run docker-compose up
-      shell: docker compose up -d db
+      shell: docker compose up -d
       args:
         chdir: /home/{{ ansible_user_id }}/FamilyDoctor
       register: docker_compose_up
