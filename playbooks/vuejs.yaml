@@ -1,4 +1,4 @@
----
+--- #NOT TESTED 
 - hosts: gcloud-app-server
 
   vars:
@@ -7,7 +7,7 @@
       site_location: /var/www/vue
 
   pre_tasks:
-
+ 
     - name: Install Nginx
       package:
         name: nginx
