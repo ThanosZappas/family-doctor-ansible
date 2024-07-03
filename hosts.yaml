@@ -3,9 +3,13 @@ control:
   hosts:
     local-control:
       ansible_connection: local
+    # control-vm:
+    #   ansible_host: control
 
 appservers:
     hosts:
+      # frontend-vm:
+      #   ansible_host: frontserver
       gcloud-app-server:
         ansible_host: googlevm
       jenkins-server-vm:
@@ -13,5 +17,7 @@ appservers:
       
 dbservers:
     hosts:
+      # dbserver-vm:
+      #     ansible_host: googlevm
       azure-db-server:
           ansible_host: devopsvm

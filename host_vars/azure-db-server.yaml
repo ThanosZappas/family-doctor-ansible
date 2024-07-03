@@ -1,4 +1,4 @@
 db:
-  name: "postgres"
+  name: "db"
   user: "dbuser"
   password: "pass123"

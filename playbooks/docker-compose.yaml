@@ -1,7 +1,10 @@
 ---
-- name: Setup and deploy FamilyDoctor application
+- name: docker compose app with ansible
   hosts: azure-db-server
   become: yes
+  vars: 
+    appdir: "{{ ansible_user_dir }}/FamilyDoctor"
+    branch: "version1"
 
   pre_tasks:
     - name: Install required packages
@@ -32,72 +35,42 @@
           - containerd.io
         state: present
 
-    - name: Ensure pip is installed
+    - name: Install pip
       apt:
         name: python3-pip
         state: present
 
-    - name: Uninstall any existing Docker Compose version
+    - name: Install Docker Compose
       pip:
         name: docker-compose
-        state: absent
 
-    - name: Download Docker Compose binary
-      shell: curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m`" -o /usr/local/bin/docker-compose
-
-    - name: Apply executable permissions to the Docker Compose binary
-      file:
-        path: /usr/local/bin/docker-compose
-        mode: '0755'
-
-    - name: Check Docker version
-      command: docker --version
-      register: docker_version
-
-    - name: Check Docker Compose version
-      command: /usr/local/bin/docker-compose --version
-      register: docker_compose_version
-
-    - name: Debug Docker and Docker Compose versions
-      debug:
-        msg: 
-          - "Docker version: {{ docker_version.stdout }}"
-          - "Docker Compose version: {{ docker_compose_version.stdout }}"
-
-  tasks:
-    - name: Stop any process using port 5432
-      shell: |
-        fuser -k 5432/tcp || true
-      ignore_errors: yes
-      
-    - name: Stop existing Docker containers using port 5432
-      shell: |
-        docker ps --filter "publish=5432" --format "{{ '{{' }}.ID{{ '}}' }}" | xargs -r docker stop
-
-    - name: Clone FamilyDoctor repository
+    - name: "Clone the git repository"
       git:
-        repo: https://github.com/grgcncr/FamilyDoctor.git
-        dest: /home/{{ ansible_user_id }}/FamilyDoctor
-        version: version1
+         repo: "https://github.com/grgcncr/FamilyDoctor.git"
+         dest: "{{ appdir }}"
+         version: "{{ branch }}"  
+         force: yes
 
-    - name: Change directory ownership to the ansible_user
-      file:
-        path: /home/{{ ansible_user_id }}/FamilyDoctor
-        state: directory
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_id }}"
+    # - name: "Populate application.properties"
+    #   lineinfile:
+    #     dest: "{{ appdir }}/src/main/resources/application.properties"
+    #     state: present
+    #     regexp: "^{{item.key}}="
+    #     line: "{{item.key}}={{item.value}}"
+    #     with_items:
+    #       - "{{app.env | dict2items}}" 
+
+    # - name: Change directory ownership to the ansible_user
+    #   file:
+    #     path: /home/{{ ansible_user_id }}/FamilyDoctor
+    #     state: directory
+    #     owner: "{{ ansible_user_id }}"
+    #     group: "{{ ansible_user_id }}"
 
     - name: Run docker-compose up
-      shell: docker compose up -d
+      shell: docker compose up 
       args:
-        chdir: /home/{{ ansible_user_id }}/FamilyDoctor
-      register: docker_compose_up
-      ignore_errors: yes
-
-    - name: Check docker-compose up result
-      fail:
-        msg: "Docker Compose failed with error: {{ docker_compose_up.stderr }}"
-      when: docker_compose_up.failed
+        chdir: "{{appdir}}"
 
   post_tasks:
     - name: Verify Docker Compose services are running
